@@ -32,18 +32,20 @@ ARG UBLUE_IMAGE_TAG="stable"
 ARG VERSION=""
 ARG IMAGE_FLAVOR=""
 
-# ── Pre-build workarounds (upstream Bluefin issues) ────────────────
-# F44/GNOME 50: appindicatorsupport extension dir missing
-RUN mkdir -p /usr/share/gnome-shell/extensions/appindicatorsupport@rgcjonas.gmail.com/schemas
-# F44: bazaar extension tmp dir missing
-RUN mkdir -p /usr/share/gnome-shell/extensions/tmp/bazaar-integration@kolunmi.github.io/src/
+# ── Pre-build workarounds (upstream Bluefin F44/GNOME 50) ─────────
+RUN mkdir -p /usr/share/gnome-shell/extensions/appindicatorsupport@rgcjonas.gmail.com/schemas \
+    /usr/share/gnome-shell/extensions/tmp/bazaar-integration@kolunmi.github.io/src/ \
+    /usr/share/gnome-shell/extensions/bazaar-integration@kolunmi.github.io
 
-# Build, cleanup, lint.
+# Build, cleanup, lint (with F44 compatibility patches).
 RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     --mount=type=cache,dst=/var/cache/rpm-ostree \
     --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=secret,id=GITHUB_TOKEN \
-    /ctx/build_files/shared/build.sh
+    sed -i 's|^make -C /usr/share/gnome-shell/extensions/blur-my-shell@aunetx$|test -f /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/Makefile \&\& make -C /usr/share/gnome-shell/extensions/blur-my-shell@aunetx || echo "blur-my-shell: skipped"|' /ctx/build_files/shared/build-gnome-extensions.sh \
+    && sed -i 's|^unzip -o /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/build/blur-my-shell@aunetx.shell-extension.zip|test -f /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/build/blur-my-shell@aunetx.shell-extension.zip \&\& unzip -o /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/build/blur-my-shell@aunetx.shell-extension.zip || echo "blur-my-shell: unzip skipped"|' /ctx/build_files/shared/build-gnome-extensions.sh \
+    && sed -i 's|^mv /usr/share/gnome-shell/extensions/tmp/caffeine/caffeine@patapon.info|test -d /usr/share/gnome-shell/extensions/tmp/caffeine/caffeine@patapon.info \&\& mv /usr/share/gnome-shell/extensions/tmp/caffeine/caffeine@patapon.info || echo "caffeine: skipped"|' /ctx/build_files/shared/build-gnome-extensions.sh \
+    && /ctx/build_files/shared/build.sh
 
 # ── Chaossynergy overlay ──────────────────────────────────────────
 COPY chaos_files/ /tmp/chaos/
