@@ -5,6 +5,7 @@ brew_image := "ghcr.io/ublue-os/brew:latest"
 images := '(
     [bluefin]=bluefin
     [bluefin-dx]=bluefin-dx
+    [chaossynergy]=chaossynergy
 )'
 flavors := '(
     [main]=main

@@ -20,5 +20,5 @@ This repo is a fork of `ublue-os/bluefin` with our overlay in `chaos_files/`.
 ## Build
 
 ```bash
-sudo just build chaossynergy stable main
+sudo -E $(command -v just) build chaossynergy stable main
 ```

@@ -31,7 +31,7 @@ Two windows. A browser. An agent. Connected at the protocol level.
 
 ```bash
 # Build the OS image
-sudo just build chaossynergy stable main
+sudo -E $(command -v just) build chaossynergy stable main
 
 # Build a QCOW2 VM image
 just build-qcow2 localhost/chaossynergy stable
