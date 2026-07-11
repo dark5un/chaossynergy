@@ -32,6 +32,10 @@ ARG UBLUE_IMAGE_TAG="stable"
 ARG VERSION=""
 ARG IMAGE_FLAVOR=""
 
+# ── Pre-build workarounds (upstream Bluefin issues) ────────────────
+# F44/GNOME 50: appindicatorsupport extension dir missing
+RUN mkdir -p /usr/share/gnome-shell/extensions/appindicatorsupport@rgcjonas.gmail.com/schemas
+
 # Build, cleanup, lint.
 RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     --mount=type=cache,dst=/var/cache/rpm-ostree \
