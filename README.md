@@ -30,8 +30,8 @@ Two windows. A browser. An agent. Connected at the protocol level.
 ## Quick Start
 
 ```bash
-# Build the OS image
-sudo -E $(command -v just) build chaossynergy stable main
+# Build the OS image (NVIDIA flavor)
+sudo -E $(command -v just) build chaossynergy stable nvidia-open
 
 # Build a QCOW2 VM image
 just build-qcow2 localhost/chaossynergy stable
