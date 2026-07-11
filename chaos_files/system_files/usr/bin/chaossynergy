@@ -1,0 +1,40 @@
+#!/bin/bash
+# Chaossynergy — Agent launcher
+# Runs user setup on first login, then starts herdr.
+# From herdr, press 'n' to create a workspace, then type:
+#   distrobox enter agent
+set -euo pipefail
+
+CONTAINER_NAME="agent"
+SETUP_FLAG="${HOME}/.config/chaossynergy/setup-done"
+
+# ── Check if agent container exists ───────────────────────────────
+# NOTE: The container must be user-level, not root-level.
+# distrobox list shows only user containers.
+# sudo distrobox list shows root containers (wrong).
+if ! distrobox list 2>/dev/null | grep -q "$CONTAINER_NAME"; then
+    echo "╔══════════════════════════════════════════════════╗"
+    echo "║   Chaossynergy — Agent OS                        ║"
+    echo "╠══════════════════════════════════════════════════╣"
+    echo "║                                                  ║"
+    echo "║  Setting up the agent container...               ║"
+    echo "║  This runs once on first boot.                   ║"
+    echo "║                                                  ║"
+    echo "╚══════════════════════════════════════════════════╝"
+    # Run setup as the user (not via sudo systemd) so the container
+    # is created in the user's podman namespace and is visible to
+    # `distrobox enter` without sudo.
+    bash /usr/libexec/hermes/setup-container.sh
+    echo "  Container setup complete."
+    echo ""
+fi
+
+# ── Run user-level setup on first login ───────────────────────────
+if [ ! -f "$SETUP_FLAG" ]; then
+    bash /usr/libexec/hermes/user-setup.sh
+fi
+
+# ── Start herdr ───────────────────────────────────────────────────
+# herdr auto-detects running agents and shows their state
+# Press Ctrl+B for navigate mode (workspaces, tabs, panes)
+exec herdr

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Chaossynergy App Icon -->
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="40" fill="#0a0a12"/>
+  <!-- Outer ring -->
+  <circle cx="100" cy="100" r="85" fill="none" stroke="#a78bfa" stroke-width="3" opacity="0.5"/>
+  <circle cx="100" cy="100" r="75" fill="none" stroke="#a78bfa" stroke-width="1.5" opacity="0.25"/>
+  <!-- Inner synergy ring -->
+  <circle cx="100" cy="100" r="40" fill="none" stroke="#f59e0b" stroke-width="2.5" opacity="0.5" stroke-dasharray="4 8"/>
+  <!-- Core -->
+  <circle cx="100" cy="100" r="6" fill="url(#grad)" opacity="0.8"/>
+  <!-- Orbiting nodes -->
+  <circle cx="100" cy="60" r="5" fill="#f59e0b" opacity="0.8"/>
+  <circle cx="100" cy="140" r="5" fill="#22d3ee" opacity="0.8"/>
+  <circle cx="60" cy="100" r="5" fill="#a78bfa" opacity="0.8"/>
+  <circle cx="140" cy="100" r="5" fill="#f59e0b" opacity="0.8"/>
+</svg>

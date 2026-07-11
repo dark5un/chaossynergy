@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>Chaossynergy</name>
+    <filename>/usr/share/backgrounds/chaossynergy/chaossynergy-wallpaper.png</filename>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#050508</pcolor>
+    <scolor>#050508</scolor>
+  </wallpaper>
+</wallpapers>

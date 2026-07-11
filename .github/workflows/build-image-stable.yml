@@ -1,17 +1,17 @@
-name: Stable Images
+name: Chaossynergy Images
 on:
-  merge_group: # Make Stable-Daily run on merge groups
   pull_request:
     branches:
-      - main
-      - testing
+      - chaos
     paths-ignore:
       - "**.md"
       - ".github/workflows/*validate*.yml"
-      - "system_files/shared/etc/bazaar/**"
-  schedule:
-    - cron: "0 1 * * TUE" # Every Tuesday at 1:00 AM UTC (same as bluefin-lts)
-  workflow_call:
+  push:
+    branches:
+      - chaos
+    paths-ignore:
+      - "**.md"
+      - ".github/workflows/*validate*.yml"
   workflow_dispatch:
 
 permissions:
@@ -22,25 +22,15 @@ permissions:
   artifact-metadata: write
 
 jobs:
-  build-image-stable:
-    name: Build Stable Images
+  build-image-chaos:
+    name: Build Chaossynergy
     uses: ./.github/workflows/reusable-build.yml
     secrets: inherit
     strategy:
       fail-fast: false
       matrix:
-        brand_name: ["bluefin"]
+        brand_name: ["chaossynergy"]
     with:
- #    kernel_pin: 6.17.12-300.fc43.x86_64 ## Pin to 6.17 for ZFS compatibility
       brand_name: ${{ matrix.brand_name }}
       stream_name: stable
-
-  generate-release:
-    name: Generate Release
-    needs: [build-image-stable]
-    permissions:
-      contents: write
-    secrets: inherit
-    uses: ./.github/workflows/generate-release.yml
-    with:
-      stream_name: '["stable", "stable-daily"]'
+      image_flavors: "['main']"

@@ -39,6 +39,10 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     --mount=type=secret,id=GITHUB_TOKEN \
     /ctx/build_files/shared/build.sh
 
+# ── Chaossynergy overlay ──────────────────────────────────────────
+COPY chaos_files/ /tmp/chaos/
+RUN bash /tmp/chaos/build.sh && rm -rf /tmp/chaos
+
 # Makes `/opt` writeable by default
 # Needs to be here to make the main image build strict (no /opt there)
 # This is for downstream images/stuff like k0s

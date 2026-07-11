@@ -1,0 +1,15 @@
+[Unit]
+Description=Chaossynergy Agent Container Setup
+# Note: ConditionFirstBoot doesn't reliably trigger on bootc-installed
+# systems. The chaossynergy launcher detects missing container and
+# calls this service directly instead.
+After=network-online.target podman.socket
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/hermes/setup-container.sh
+
+[Install]
+WantedBy=multi-user.target

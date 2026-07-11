@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Chaossynergy Agent
+Comment=Launch herdr — agent-native terminal multiplexer
+Exec=gnome-terminal --maximize --title="Chaossynergy" -- /usr/bin/chaossynergy
+Terminal=false
+StartupNotify=false
+Categories=System;
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=3
