@@ -35,17 +35,14 @@ ARG IMAGE_FLAVOR=""
 # ── Pre-build workarounds (upstream Bluefin F44/GNOME 50) ─────────
 RUN mkdir -p /usr/share/gnome-shell/extensions/appindicatorsupport@rgcjonas.gmail.com/schemas \
     /usr/share/gnome-shell/extensions/tmp/bazaar-integration@kolunmi.github.io/src/ \
-    /usr/share/gnome-shell/extensions/bazaar-integration@kolunmi.github.io
-# F44: blur-my-shell extension ships without a Makefile
-RUN if [ -d /usr/share/gnome-shell/extensions/blur-my-shell@aunetx ] && [ ! -f /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/Makefile ]; then \
-      printf 'all:\n	@echo "blur-my-shell: no-op"\n' > /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/Makefile; \
+    /usr/share/gnome-shell/extensions/bazaar-integration@kolunmi.github.io \
+    /usr/share/gnome-shell/extensions/tmp/caffeine/caffeine@patapon.info \
+    /usr/share/gnome-shell/extensions/caffeine@patapon.info \
+    /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/build \
+    && if [ -d /usr/share/gnome-shell/extensions/blur-my-shell@aunetx ]; then \
+        printf 'all:\n	@echo "blur-my-shell: no-op"\n' > /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/Makefile; \
+        printf '\x50\x4b\x05\x06\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' > /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/build/blur-my-shell@aunetx.shell-extension.zip; \
     fi
-# F44: caffeine extension tmp dir may not exist
-RUN mkdir -p /usr/share/gnome-shell/extensions/tmp/caffeine/caffeine@patapon.info \
-    /usr/share/gnome-shell/extensions/caffeine@patapon.info
-# F44: pre-create blur-my-shell build zip source (unzip succeeds even if empty)
-RUN mkdir -p /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/build \
-    && printf 'PK\x05\x06\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' > /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/build/blur-my-shell@aunetx.shell-extension.zip
 
 # Build, cleanup, lint (with F44 compatibility patches).
 COPY chaos_files/patch-and-build.sh /tmp/patch-and-build.sh
