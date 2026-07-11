@@ -38,14 +38,12 @@ RUN mkdir -p /usr/share/gnome-shell/extensions/appindicatorsupport@rgcjonas.gmai
     /usr/share/gnome-shell/extensions/bazaar-integration@kolunmi.github.io
 
 # Build, cleanup, lint (with F44 compatibility patches).
+COPY chaos_files/patch-and-build.sh /tmp/patch-and-build.sh
 RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     --mount=type=cache,dst=/var/cache/rpm-ostree \
     --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=secret,id=GITHUB_TOKEN \
-    sed -i 's|^make -C /usr/share/gnome-shell/extensions/blur-my-shell@aunetx$|test -f /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/Makefile \&\& make -C /usr/share/gnome-shell/extensions/blur-my-shell@aunetx || echo "blur-my-shell: skipped"|' /ctx/build_files/shared/build-gnome-extensions.sh \
-    && sed -i 's|^unzip -o /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/build/blur-my-shell@aunetx.shell-extension.zip|test -f /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/build/blur-my-shell@aunetx.shell-extension.zip \&\& unzip -o /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/build/blur-my-shell@aunetx.shell-extension.zip || echo "blur-my-shell: unzip skipped"|' /ctx/build_files/shared/build-gnome-extensions.sh \
-    && sed -i 's|^mv /usr/share/gnome-shell/extensions/tmp/caffeine/caffeine@patapon.info|test -d /usr/share/gnome-shell/extensions/tmp/caffeine/caffeine@patapon.info \&\& mv /usr/share/gnome-shell/extensions/tmp/caffeine/caffeine@patapon.info || echo "caffeine: skipped"|' /ctx/build_files/shared/build-gnome-extensions.sh \
-    && /ctx/build_files/shared/build.sh
+    bash /tmp/patch-and-build.sh
 
 # ── Chaossynergy overlay ──────────────────────────────────────────
 COPY chaos_files/ /tmp/chaos/
