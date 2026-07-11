@@ -38,8 +38,7 @@ RUN mkdir -p /usr/share/gnome-shell/extensions/appindicatorsupport@rgcjonas.gmai
     /usr/share/gnome-shell/extensions/bazaar-integration@kolunmi.github.io
 # F44: blur-my-shell extension ships without a Makefile
 RUN if [ -d /usr/share/gnome-shell/extensions/blur-my-shell@aunetx ] && [ ! -f /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/Makefile ]; then \
-      echo 'all:' > /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/Makefile; \
-      echo '	@echo "blur-my-shell: no-op"' >> /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/Makefile; \
+      printf 'all:\n	@echo "blur-my-shell: no-op"\n' > /usr/share/gnome-shell/extensions/blur-my-shell@aunetx/Makefile; \
     fi
 # F44: caffeine extension tmp dir may not exist
 RUN mkdir -p /usr/share/gnome-shell/extensions/tmp/caffeine/caffeine@patapon.info \
