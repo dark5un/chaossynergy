@@ -35,6 +35,8 @@ ARG IMAGE_FLAVOR=""
 # ── Pre-build workarounds (upstream Bluefin issues) ────────────────
 # F44/GNOME 50: appindicatorsupport extension dir missing
 RUN mkdir -p /usr/share/gnome-shell/extensions/appindicatorsupport@rgcjonas.gmail.com/schemas
+# F44: bazaar extension tmp dir missing
+RUN mkdir -p /usr/share/gnome-shell/extensions/tmp/bazaar-integration@kolunmi.github.io/src/
 
 # Build, cleanup, lint.
 RUN --mount=type=cache,dst=/var/cache/libdnf5 \
