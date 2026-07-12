@@ -52,8 +52,9 @@ MCPEOF
 # ── 3. Clean GNOME desktop (dark mode, hide dock, minimal chrome) ──
 echo "[chaossynergy] Enforcing dark mode and clean layout..."
 
-# Force GNOME to dark mode (Ptyxis follows this, not individual profile settings)
+# Force GNOME to dark mode (Ptyxis and GTK apps follow this)
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
+gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark' 2>/dev/null || true
 
 # Disable dash-to-dock for unobstructed desktop
 gnome-extensions disable dash-to-dock@micxgx.gmail.com 2>/dev/null || \
@@ -84,12 +85,12 @@ echo "[chaossynergy] Applying alchemical dark terminal theme..."
 PROFILE_UUID=$(gsettings get org.gnome.Ptyxis default-profile-uuid 2>/dev/null | tr -d "'") || PROFILE_UUID=""
 if [ -n "$PROFILE_UUID" ]; then
     PROFILE_PATH="/org/gnome/Ptyxis/Profiles/${PROFILE_UUID}/"
-    # Base colors — dark background, light foreground
-    dconf write "${PROFILE_PATH}background-color" "'rgb(5,5,8)'" 2>/dev/null || true
-    dconf write "${PROFILE_PATH}foreground-color" "'rgb(228,228,231)'" 2>/dev/null || true
+    # Base colors — deep purple-black background (matches wallpaper), light lavender foreground
+    dconf write "${PROFILE_PATH}background-color" "'rgb(10,10,25)'" 2>/dev/null || true
+    dconf write "${PROFILE_PATH}foreground-color" "'rgb(220,215,235)'" 2>/dev/null || true
     dconf write "${PROFILE_PATH}use-theme-colors" "false" 2>/dev/null || true
-    # Full 16-color ANSI palette — alchemistic dark scheme
-    dconf write "${PROFILE_PATH}palette" "['rgb(5,5,8)', 'rgb(255,95,86)', 'rgb(39,201,63)', 'rgb(245,158,11)', 'rgb(167,139,250)', 'rgb(255,121,198)', 'rgb(34,211,238)', 'rgb(228,228,231)', 'rgb(85,85,102)', 'rgb(255,95,86)', 'rgb(39,201,63)', 'rgb(245,158,11)', 'rgb(167,139,250)', 'rgb(255,121,198)', 'rgb(34,211,238)', 'rgb(255,255,255)']" 2>/dev/null || true
+    # Full 16-color ANSI palette — alchemistic dark scheme matching wallpaper
+    dconf write "${PROFILE_PATH}palette" "['rgb(10,10,25)', 'rgb(255,95,86)', 'rgb(39,201,63)', 'rgb(245,158,11)', 'rgb(167,139,250)', 'rgb(255,121,198)', 'rgb(34,211,238)', 'rgb(220,215,235)', 'rgb(85,85,120)', 'rgb(255,95,86)', 'rgb(39,201,63)', 'rgb(245,158,11)', 'rgb(167,139,250)', 'rgb(255,121,198)', 'rgb(34,211,238)', 'rgb(255,255,255)']" 2>/dev/null || true
     gsettings set org.gnome.Ptyxis use-system-font false 2>/dev/null || true
     gsettings set org.gnome.Ptyxis font-name 'JetBrainsMono Nerd Font 12' 2>/dev/null || true
     echo "  ✓ Ptyxis dark theme applied"
