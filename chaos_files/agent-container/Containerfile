@@ -1,0 +1,26 @@
+# Chaossynergy Agent Container
+# Bundles hermes, chromium, node, pass, GPG — everything the agent needs.
+FROM quay.io/fedora/fedora:latest
+
+ENV PATH="/root/.local/bin:/usr/local/bin:${PATH}"
+
+RUN dnf install -y \
+    chromium \
+    nodejs \
+    npm \
+    pass \
+    pinentry-gnome3 \
+    python3-pip \
+    gh \
+    which \
+    curl \
+    git \
+    findutils \
+    procps-ng \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
+
+RUN curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash \
+    && ln -sf /usr/local/lib/hermes-agent/venv/bin/hermes /usr/local/bin/hermes
+
+CMD ["/bin/bash"]

@@ -48,6 +48,9 @@ run-vm-qcow2 tag="stable":
 
 # ── Bluefin upstream build system (kept for reference) ────────────
 # The original Bluefin Justfile from the fork is at .github/bluefin-justfile.bak
+
+check:
+    @echo "OK"
 # We don't use their build pipeline anymore — we build FROM their LTS image.
 # To rebase on upstream changes, merge ublue-os/bluefin main into chaos-f44
 # and port any relevant changes to our Containerfile.

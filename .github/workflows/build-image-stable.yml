@@ -1,36 +1,71 @@
-name: Chaossynergy Images
+name: Chaossynergy build + push
 on:
-  pull_request:
-    branches:
-      - chaos
-    paths-ignore:
-      - "**.md"
-      - ".github/workflows/*validate*.yml"
   push:
-    branches:
-      - chaos
-    paths-ignore:
-      - "**.md"
-      - ".github/workflows/*validate*.yml"
+    branches: [chaos]
+    paths-ignore: ["**.md"]
   workflow_dispatch:
 
 permissions:
   contents: read
   packages: write
   id-token: write
-  attestations: write
-  artifact-metadata: write
 
 jobs:
-  build-image-chaos:
-    name: Build Chaossynergy
-    uses: ./.github/workflows/reusable-build.yml
-    secrets: inherit
-    strategy:
-      fail-fast: false
-      matrix:
-        brand_name: ["chaossynergy"]
-    with:
-      brand_name: ${{ matrix.brand_name }}
-      stream_name: stable
-      image_flavors: "['main']"
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Podman
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y podman
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build container image
+        run: |
+          podman build \
+            --build-arg BASE_TAG=stable \
+            -t ghcr.io/${{ github.repository }}:stable \
+            -t ghcr.io/${{ github.repository }}:${{ github.sha }} \
+            -f Containerfile .
+
+      - name: Push image
+        run: |
+          podman push ghcr.io/${{ github.repository }}:stable
+          podman push ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+  build-agent:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Podman
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y podman
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build agent container image
+        run: |
+          podman build \
+            -t ghcr.io/${{ github.repository_owner }}/chaossynergy-agent:latest \
+            -t ghcr.io/${{ github.repository_owner }}/chaossynergy-agent:${{ github.sha }} \
+            -f chaos_files/agent-container/Containerfile .
+
+      - name: Push agent image
+        run: |
+          podman push ghcr.io/${{ github.repository_owner }}/chaossynergy-agent:latest
+          podman push ghcr.io/${{ github.repository_owner }}/chaossynergy-agent:${{ github.sha }}
