@@ -85,12 +85,10 @@ echo "[chaossynergy] Applying alchemical dark terminal theme..."
 PROFILE_UUID=$(gsettings get org.gnome.Ptyxis default-profile-uuid 2>/dev/null | tr -d "'") || PROFILE_UUID=""
 if [ -n "$PROFILE_UUID" ]; then
     PROFILE_PATH="/org/gnome/Ptyxis/Profiles/${PROFILE_UUID}/"
-    # Base colors — deep purple-black background (matches wallpaper), light lavender foreground
-    dconf write "${PROFILE_PATH}background-color" "'rgb(10,10,25)'" 2>/dev/null || true
-    dconf write "${PROFILE_PATH}foreground-color" "'rgb(220,215,235)'" 2>/dev/null || true
+    # Dark background alchemical theme
     dconf write "${PROFILE_PATH}use-theme-colors" "false" 2>/dev/null || true
-    # Full 16-color ANSI palette — alchemistic dark scheme matching wallpaper
-    dconf write "${PROFILE_PATH}palette" "['rgb(10,10,25)', 'rgb(255,95,86)', 'rgb(39,201,63)', 'rgb(245,158,11)', 'rgb(167,139,250)', 'rgb(255,121,198)', 'rgb(34,211,238)', 'rgb(220,215,235)', 'rgb(85,85,120)', 'rgb(255,95,86)', 'rgb(39,201,63)', 'rgb(245,158,11)', 'rgb(167,139,250)', 'rgb(255,121,198)', 'rgb(34,211,238)', 'rgb(255,255,255)']" 2>/dev/null || true
+    dconf write "${PROFILE_PATH}background-color" "'rgb(26,26,46)'" 2>/dev/null || true
+    dconf write "${PROFILE_PATH}foreground-color" "'rgb(224,224,224)'" 2>/dev/null || true
     gsettings set org.gnome.Ptyxis use-system-font false 2>/dev/null || true
     gsettings set org.gnome.Ptyxis font-name 'JetBrainsMono Nerd Font 12' 2>/dev/null || true
     echo "  ✓ Ptyxis dark theme applied"
