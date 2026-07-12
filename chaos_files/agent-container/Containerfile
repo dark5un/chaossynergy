@@ -1,5 +1,10 @@
 # Chaossynergy Agent Container
 # Bundles hermes, chromium, node, pass, GPG — everything the agent needs.
+# Auto-connect the image to this repo so GITHUB_TOKEN has write access
+LABEL org.opencontainers.image.source="https://github.com/dark5un/chaossynergy"
+LABEL org.opencontainers.image.description="Chaossynergy Agent Container"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+
 FROM quay.io/fedora/fedora:latest
 
 ENV PATH="/root/.local/bin:/usr/local/bin:${PATH}"
