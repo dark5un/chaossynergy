@@ -1,0 +1,12 @@
+[Unit]
+Description=Chaossynergy — herdr terminal multiplexer
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ptyxis -- /usr/bin/chaossynergy
+Restart=no
+
+[Install]
+WantedBy=graphical-session.target

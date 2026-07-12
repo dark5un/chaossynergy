@@ -1,0 +1,36 @@
+#!/bin/bash
+# Chaossynergy — Agent launcher
+# Runs user setup on first login, then starts herdr.
+# herdr runs on the host, but every shell auto-enters the agent distrobox
+# via the --shell flag so hermes/chromium/pass are available.
+set -euo pipefail
+
+CONTAINER_NAME="agent"
+SETUP_FLAG="${HOME}/.config/chaossynergy/setup-done"
+
+# ── Check if agent container exists ───────────────────────────────
+if ! distrobox list 2>/dev/null | grep -q "$CONTAINER_NAME"; then
+    echo "╔══════════════════════════════════════════════════╗"
+    echo "║   Chaossynergy — Agent OS                        ║"
+    echo "╠══════════════════════════════════════════════════╣"
+    echo "║                                                  ║"
+    echo "║  Setting up the agent container...               ║"
+    echo "║  This runs once on first boot.                   ║"
+    echo "║                                                  ║"
+    echo "╚══════════════════════════════════════════════════╝"
+    bash /usr/libexec/hermes/setup-container.sh
+    echo "  Container setup complete."
+    echo ""
+fi
+
+# ── Run user-level setup on first login ───────────────────────────
+if [ ! -f "$SETUP_FLAG" ]; then
+    bash /usr/libexec/hermes/user-setup.sh
+fi
+
+# ── Start herdr on host, shells auto-enter distrobox ──────────────
+# herdr reads $SHELL to determine which shell to spawn in new panes.
+# We point it at the chaossynergy-shell wrapper which enters the
+# agent container where hermes/chromium/pass live.
+export SHELL=/usr/bin/chaossynergy-shell
+exec herdr

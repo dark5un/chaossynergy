@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>Chaossynergy — Sigil</name>
+    <filename>/usr/share/backgrounds/chaossynergy/chaossynergy-wallpaper.png</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Chaossynergy — DNA Helix</name>
+    <filename>/usr/share/backgrounds/chaossynergy/wallpaper-dna.png</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Chaossynergy — Mandala</name>
+    <filename>/usr/share/backgrounds/chaossynergy/wallpaper-mandala.png</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Chaossynergy — Circuit</name>
+    <filename>/usr/share/backgrounds/chaossynergy/wallpaper-circuit.png</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Chaossynergy — Arcane</name>
+    <filename>/usr/share/backgrounds/chaossynergy/wallpaper-arcane.png</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Chaossynergy — Aurora</name>
+    <filename>/usr/share/backgrounds/chaossynergy/wallpaper-aurora.png</filename>
+    <options>zoom</options>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>Chaossynergy — Technomage</name>
+    <filename>/usr/share/backgrounds/chaossynergy/wallpaper-technomage.png</filename>
+    <options>zoom</options>
+  </wallpaper>
+</wallpapers>

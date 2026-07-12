@@ -1,0 +1,10 @@
+{
+  "org.fedoraproject.Anaconda.Product": {
+    "product": {
+      "name": "Chaossynergy",
+      "version": "",
+      "bug_url": "https://github.com/dark5un/chaossynergy/issues",
+      "logo_filename": "chaossynergy.svg"
+    }
+  }
+}

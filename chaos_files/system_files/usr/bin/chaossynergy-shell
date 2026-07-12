@@ -1,0 +1,5 @@
+#!/bin/bash
+# Chaossynergy — herdr shell wrapper
+# Every new pane/workspace in herdr enters the agent distrobox
+# where hermes, chromium, pass, and all tools live.
+exec distrobox enter agent -- bash -l
