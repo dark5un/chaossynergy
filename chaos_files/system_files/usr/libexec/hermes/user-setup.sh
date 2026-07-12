@@ -89,6 +89,8 @@ if [ -n "$PROFILE_UUID" ]; then
     dconf write "${PROFILE_PATH}use-theme-colors" "false" 2>/dev/null || true
     dconf write "${PROFILE_PATH}background-color" "'rgb(26,26,46)'" 2>/dev/null || true
     dconf write "${PROFILE_PATH}foreground-color" "'rgb(224,224,224)'" 2>/dev/null || true
+    # Synthwave Alpha — built-in named palette in Ptyxis
+    dconf write "${PROFILE_PATH}palette" "'synthwave-alpha'" 2>/dev/null || true
     gsettings set org.gnome.Ptyxis use-system-font false 2>/dev/null || true
     gsettings set org.gnome.Ptyxis font-name 'JetBrainsMono Nerd Font 12' 2>/dev/null || true
     echo "  ✓ Ptyxis dark theme applied"
