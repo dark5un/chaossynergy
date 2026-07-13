@@ -59,6 +59,38 @@ The overlay adds:
 - **user-setup** — first-login automation (pass init, wallpaper, terminal theme)
 - **branding** — Chaossynergy wallpaper, icon, Anaconda identity
 - **recovery** — Shift-at-boot root shell
+- **ujust recipes** — on-demand agent and inference setup
+
+## Agents & Inference
+
+All agents live in their own distrobox containers (per ADR-004). Install on demand with `ujust`:
+
+| Command | What it sets up |
+|---------|----------------|
+| `ujust setup-opencode` | OpenCode coding agent |
+| `ujust setup-pi` | Pi coding agent (pi.dev) |
+| `ujust setup-claude` | Claude Code coding agent |
+| `ujust setup-inference-llama` | llama.cpp inference on port 8080 |
+| `ujust setup-inference-vllm` | vLLM inference on port 8000 |
+| `ujust list-agents` | Show installed agent containers |
+
+Inference engines are mutually exclusive (both fight for VRAM). Switching engines stops the other automatically.
+
+```bash
+# Start local inference with llama
+ujust setup-inference-llama
+
+# Switch to vLLM (stops llama first)
+ujust setup-inference-vllm
+
+# Switch quant on llama (Q4_K_M ↔ Q8_0)
+ujust inference-model
+
+# Use it in Hermes
+hermes model set custom:local-llama/bottlecapai/ThinkingCap-Qwen3.6-27B-GGUF:Q4_K_M
+```
+
+The inference container has GPU access via `nvidia-container-toolkit` and runs as a systemd user service for persistence.
 
 ## Repository
 
@@ -78,14 +110,35 @@ The overlay adds:
 │  │  ├── herdr (fullscreen terminal on boot)         │  │
 │  │  ├── user-setup (first login automation)         │  │
 │  │  ├── branding (wallpaper, icon)                  │  │
-│  │  └── recovery (Shift-at-boot root shell)         │  │
+│  │  ├── recovery (Shift-at-boot root shell)         │  │
+│  │  ├── ujust/chaossynergy.just                     │  │
+│  │  │   (agents + inference recipes)                │  │
+│  │  └── ADR-011/012 (local inference, toolchain)    │  │
+│  └──────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │  Distrobox containers (on-demand via ujust)       │  │
+│  │  ├── hermes    (first-boot, orchestration)       │  │
+│  │  ├── opencode  (coding agent)                    │  │
+│  │  ├── pi        (Pi coding agent)                 │  │
+│  │  ├── claude    (Claude Code)                     │  │
+│  │  └── inference (llama.cpp or vLLM)               │  │
 │  └──────────────────────────────────────────────────┘  │
 └────────────────────────────────────────────────────────┘
 ```
 
 ## ADRs
 
-Architecture Decision Records live in [`chaos_files/docs/adr/`](chaos_files/docs/adr/).
+Architecture Decision Records live in [`chaos_files/docs/adr/`](chaos_files/docs/adr/). Key records:
+
+| # | Title | Status |
+|---|-------|--------|
+| ADR-001 | [Architecture Decisions](chaos_files/docs/adr/ADR-001-architecture-decisions.md) | Accepted |
+| ADR-004 | [Multi-Agent Architecture](chaos_files/docs/adr/ADR-004-multi-agent-architecture.md) | Draft |
+| ADR-005 | [Minimal Host, Container-First](chaos_files/docs/adr/ADR-005-minimal-host-container-first.md) | Draft |
+| ADR-008 | [Desktop Experience](chaos_files/docs/adr/ADR-008-desktop-experience.md) | Accepted |
+| ADR-010 | [Visual Context for Agent-Human Pairing](chaos_files/docs/adr/ADR-010-presence-aware-safety.md) | Proposed |
+| ADR-011 | [Local Inference Runtime](chaos_files/docs/adr/ADR-011-local-inference-runtime.md) | Draft |
+| ADR-012 | [Agent Toolchain Expansion](chaos_files/docs/adr/ADR-012-agent-toolchain-expansion.md) | Draft |
 
 ## License
 

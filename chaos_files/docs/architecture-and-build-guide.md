@@ -336,10 +336,13 @@ Chaossynergy is unique in being **agent-first** — the OS exists to serve the a
 | **1. Image Customization** | Switch base to bluefin-dx-nvidia, add packages, systemd services, launcher | ✅ Done |
 | **2. Local Testing** | Build QCOW2, boot in QEMU, verify first-boot flow | 🔄 On hold |
 | **3. CI Validation** | GitHub Actions building + signing + disk images | ✅ CI passes |
-| **4. Installer ISO** | Build bootc-installer for bare-metal install | ⏳ Next |
-| **5. Migration to finpilot** | Multi-stage OCI assembly for maintainability | 🔮 Future |
-| **6. Graphical Launcher** | Native agent UI (GTK/QML) replacing tmux | 🔮 Future |
-| **7. Minimal Base** | Optionally strip GNOME, build from base-main | 🔮 Future |
+| **4. Agent Toolchain** | ujust recipes for OpenCode, Pi, Claude Code agents | ✅ Draft ADR-012 |
+| **5. Local Inference** | llama.cpp + vLLM in dedicated distrobox, Hermes custom provider | ✅ Draft ADR-011 |
+| **6. Installer ISO** | Build bootc-installer for bare-metal install | ⏳ Next |
+| **7. herdr Integration** | Agent-to-agent orchestration via herdr socket API | 🔮 Future |
+| **8. Migration to finpilot** | Multi-stage OCI assembly for maintainability | 🔮 Future |
+| **9. Graphical Launcher** | Native agent UI (GTK/QML) replacing tmux | 🔮 Future |
+| **10. Minimal Base** | Optionally strip GNOME, build from base-main | 🔮 Future |
 
 ---
 
@@ -363,4 +366,9 @@ Chaossynergy is unique in being **agent-first** — the OS exists to serve the a
 | **Anaconda** | Fedora's installer (used in anaconda-iso) |
 | **bootc switch** | The command to switch a running system to a different bootc image |
 | **ujust** | Bluefin's custom `just` recipe system for user commands |
+| **llama.cpp** | GGUF inference engine; installed via `curl ... https://llama.app/install.sh \| sh` |
+| **vLLM** | High-throughput LLM serving engine with PagedAttention; `pip install vllm` |
+| **Pi Agent** | Minimal coding agent harness by Earendil Inc. (`@earendil-works/pi-coding-agent`) |
+| **OpenCode** | Provider-agnostic open-source coding agent (`opencode-ai`) |
+| **Claude Code** | Anthropic's official coding agent (`@anthropic-ai/claude-code`) |
 | **akmods** | Kernel module packages (e.g., NVIDIA drivers built per-kernel) |
