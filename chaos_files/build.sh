@@ -14,6 +14,9 @@ cp -r /chaos/system_files/usr/lib/tmpfiles.d/* /usr/lib/tmpfiles.d/
 cp -r /chaos/system_files/usr/share/anaconda/* /usr/share/anaconda/
 cp -r /chaos/system_files/usr/share/backgrounds/* /usr/share/backgrounds/
 cp -r /chaos/system_files/usr/share/icons/* /usr/share/icons/
+# Chaossynergy ujust recipes (auto-discovered by ujust on Bluefin)
+mkdir -p /usr/share/ublue-os/just
+cp -r /chaos/system_files/usr/share/ublue-os/just/* /usr/share/ublue-os/just/
 # Ensure scripts are readable+executable (cp preserves source perms which may be too restrictive)
 chmod -R 755 /usr/bin/chaossynergy /usr/bin/chaossynergy-shell /usr/libexec/hermes/
 
