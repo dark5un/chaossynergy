@@ -1,0 +1,73 @@
+// Chaossynergy Niri config
+// Agent-native, terminal-first. herdr (inside Ghostty) is the primary surface.
+// The browser opens in the adjacent column; two windows, one conductor.
+
+input {
+    keyboard {
+        // Super (Mod4) is the primary modifier; Escape-centric for Vim users.
+        xkb {
+            rules = "evdev"
+            model = "pc105"
+            layout = "us"
+        }
+    }
+
+    mouse {
+        // Emulate scroll on the ultrawide's horizontal workspaces.
+        natural-scroll = false
+    }
+
+    focus-follows-mouse = false
+}
+
+layout {
+    gaps = 12
+    center-focused-column = "always"
+
+    focus-ring {
+        width = 2
+        active-color = "#a78bfa"
+        inactive-color = "#2a2a3c"
+    }
+
+    // A single wide window (the agent terminal) fills the column naturally;
+    // browser opens a second column for the two-window pairing.
+    default-column-width { proportion = 1.0; }
+}
+
+// ── Workspaces ─────────────────────────────────────────────────────────
+// Scrollable workspaces map naturally to the ultrawide: agent / web / system.
+workspace "agent" { open-on-output = "focused"; }
+workspace "web"   { open-on-output = "focused"; }
+
+// ── Startup: the agent surface ─────────────────────────────────────────
+// herdr runs inside Ghostty as the primary pane; the agent container is
+// entered via the chaossynergy-shell wrapper (sets SHELL so every new pane
+// auto-enters the distrobox where hermes/chromium/pass live).
+spawn-at-startup "ghostty" "--class=chaossynergy" "-e" "/usr/bin/chaossynergy"
+spawn-at-startup "sh" "-c" "sleep 1 && distrobox enter agent -- chromium --ozone-platform=wayland 'https://chaossynergy.dev'"
+
+// ── Keybindings ────────────────────────────────────────────────────────
+binds {
+    Mod+Return { spawn "ghostty" "-e" "/usr/bin/chaossynergy"; }
+    Mod+D { spawn "fuzzel"; }
+    Mod+W { spawn "ghostty" "-e" "distrobox" "enter" "agent" "--" "hermes"; }
+    Mod+B { spawn "bash" "-lc" "distrobox enter agent -- chromium --ozone-platform=wayland"; }
+
+    Mod+Left  { focus-column-left; }
+    Mod+Right { focus-column-right; }
+    Mod+Comma { focus-workspace-previous; }
+    Mod+Period { focus-workspace-next; }
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+9 { focus-workspace 9; }
+
+    Mod+Shift+Q { close-window; }
+    Mod+Shift+Space { toggle-window-floating; }
+    Mod+Shift+F { maximize-column; }
+
+    Print { spawn "sh" "-c" "grim -g \"$(slurp)\" - | swappy -f -"; }
+
+    Mod+Shift+E { quit; }
+    Mod+Escape { spawn "swaylock"; }
+}

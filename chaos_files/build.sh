@@ -1,87 +1,98 @@
 #!/bin/bash
-# Chaossynergy — Post-build overlay
+# Chaossynergy Niri — Post-build overlay (no-GNOME path)
+# Base: ghcr.io/ublue-os/base-nvidia (Fedora Atomic, NVIDIA, no desktop)
 set -oue pipefail
 
-echo "[chaossynergy] Applying overlay..."
+echo "[chaossynergy-niri] Applying overlay..."
 
-# Copy our system files into the image
+# ── Copy our system files into the image ──────────────────────────────
 cp -r /chaos/system_files/usr/bin/* /usr/bin/
 cp -r /chaos/system_files/usr/libexec/* /usr/libexec/
 cp -r /chaos/system_files/usr/lib/systemd/system/* /usr/lib/systemd/system/
 mkdir -p /usr/lib/systemd/user
 cp -r /chaos/system_files/usr/lib/systemd/user/* /usr/lib/systemd/user/
 cp -r /chaos/system_files/usr/lib/tmpfiles.d/* /usr/lib/tmpfiles.d/
-cp -r /chaos/system_files/usr/share/anaconda/* /usr/share/anaconda/
 cp -r /chaos/system_files/usr/share/backgrounds/* /usr/share/backgrounds/
-cp -r /chaos/system_files/usr/share/icons/* /usr/share/icons/
-# Chaossynergy ujust recipes (auto-discovered by ujust on Bluefin)
-mkdir -p /usr/share/ublue-os/just
-cp -r /chaos/system_files/usr/share/ublue-os/just/* /usr/share/ublue-os/just/
-# Ensure scripts are readable+executable (cp preserves source perms which may be too restrictive)
+cp -r /chaos/system_files/usr/share/ublue-os/just/* /usr/share/ublue-os/just/ 2>/dev/null || true
 chmod -R 755 /usr/bin/chaossynergy /usr/bin/chaossynergy-shell /usr/libexec/hermes/
 
-# ── Install herdr ─────────────────────────────────────────────────
+# ── Install niri (Wayland compositor) + Wayland session tooling ───────
+# niri is in the Fedora repos; niri-session wires up D-Bus + portals.
+dnf install -y niri niri-inhibit-tools niri-mpris || \
+  dnf install -y niri || true
+
+# GNOME-free companion stack for a usable agent desktop:
+#   ghostty  — fast GPU-accelerated terminal emulator that herdr runs inside
+#   grim/slurp/swappy — screenshots (wayland-native)
+#   wl-clipboard      — clipboard for the agent
+#   xdg-desktop-portal — portals for file dialogs
+#   fuzzel   — app launcher
+dnf install -y ghostty grim slurp swappy wl-clipboard \
+    xdg-desktop-portal xdg-desktop-portal-gtk \
+    polkit polkit-pkla-compat \
+    fuzzel swaylock swayidle || \
+dnf install -y grim slurp swappy wl-clipboard \
+    xdg-desktop-portal xdg-desktop-portal-gtk \
+    polkit polkit-pkla-compat \
+    fuzzel swaylock swayidle || true
+
+# ── Install distrobox (agent containers) + herdr (agent multiplexer) ──
+curl -fsSL --retry 3 https://raw.githubusercontent.com/89luca89/distrobox/main/install \
+  | sh -s -- --prefix /usr/local
+
 curl -fsSL --retry 3 -o /tmp/herdr \
   https://github.com/ogulcancelik/herdr/releases/download/v0.7.3/herdr-linux-x86_64
 install -m 0755 /tmp/herdr /usr/bin/herdr
 rm -f /tmp/herdr
 
-# ── Install distrobox (not in CentOS LTS minimal base) ─────────────
-curl -fsSL --retry 3 https://raw.githubusercontent.com/89luca89/distrobox/main/install | sh -s -- --prefix /usr/local
+# ── Source Code Pro Nerd Font (Ghostty + agent UI) ────────────────────
+# Nerd Fonts build keeps glyphs needed by herdr/TUI tooling.
+SCP_DIR="/usr/share/fonts/source-code-pro-nerd"
+mkdir -p "$SCP_DIR"
+curl -fsSL --retry 3 -o /tmp/scp.zip \
+  https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/SourceCodePro.zip
+unzip -o /tmp/scp.zip -d "$SCP_DIR" 2>/dev/null || true
+rm -f /tmp/scp.zip
+fc-cache -f "$SCP_DIR" 2>/dev/null || true
 
-# ── Install JetBrains Mono Nerd Font ────────────────────────────────
-JBM_DIR="/usr/share/fonts/jetbrains-mono-nerd"
-mkdir -p "$JBM_DIR"
-curl -fsSL --retry 3 -o /tmp/jbm.zip \
-  https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.zip
-unzip -o /tmp/jbm.zip -d "$JBM_DIR" 2>/dev/null || true
-rm -f /tmp/jbm.zip
-fc-cache -f "$JBM_DIR" 2>/dev/null || true
+# Ghostty default font — Source Code Pro Nerd Font, 13pt
+mkdir -p /etc/ghostty
+cat > /etc/ghostty/config << 'EOF'
+font-family = "Source Code Pro Nerd Font"
+font-size = 13
+theme = "tokyonight"
+EOF
 
-# ── Enable services ───────────────────────────────────────────────
+# ── Niri compositor config ─────────────────────────────────────────────
+mkdir -p /etc/niri
+cp /chaos/system_files/usr/share/chaossynergy/niri/config.kdl /etc/niri/config.kdl
+
+# ── Services ───────────────────────────────────────────────────────────
 systemctl enable podman.socket || true
 systemctl enable chaossynergy-recovery.service || true
 
-# User service — auto-enable herdr for all users on login
-mkdir -p /etc/systemd/user/graphical-session.target.wants
-ln -sf /usr/lib/systemd/user/chaossynergy-herdr.service /etc/systemd/user/graphical-session.target.wants/chaossynergy-herdr.service || true
-
-# Disable GNOME Initial Setup (we create the user ourselves)
-systemctl disable gnome-initial-setup.service 2>/dev/null || true
-systemctl mask gnome-initial-setup.service 2>/dev/null || true
-# Disable GNOME welcome tour
-cat > /etc/dconf/db/distro.d/00_chaossynergy-tour << 'EOF'
-[org/gnome/shell]
-welcome-dialog-last-shown-version='99999'
-EOF
-dconf update || true
-
-# ── Create default user (avoids GNOME Initial Setup hang) ────────
-# No password — auto-login via GDM. User sets password on first session.
+# ── Create default user (no GDM — base-nvidia uses getty on tty1) ─────
+# Autologin via getty override; user owns the graphical session.
 useradd -m -G wheel -s /bin/bash aiagent 2>/dev/null || true
 passwd -d aiagent 2>/dev/null || true
 
-# ── Auto-login ────────────────────────────────────────────────────
-cat > /etc/gdm/custom.conf << 'EOF'
-[daemon]
-AutomaticLoginEnable=true
-AutomaticLogin=aiagent
+# Enable getty autologin for the aiagent user (arbitrary-VT based session)
+mkdir -p /etc/systemd/system/getty@tty1.service.d
+cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << 'EOF'
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin aiagent --noclear %I $TERM
 EOF
+systemctl enable getty@tty1.service || true
 
-# ── Branding ──────────────────────────────────────────────────────
-cat > /usr/share/glib-2.0/schemas/80_chaossynergy-wallpaper.gschema.override << 'EOF'
-[org.gnome.desktop.background]
-picture-uri='file:///usr/share/backgrounds/chaossynergy/chaossynergy-wallpaper.png'
-picture-uri-dark='file:///usr/share/backgrounds/chaossynergy/chaossynergy-wallpaper.png'
-picture-options='zoom'
-primary-color='#050508'
-secondary-color='#050508'
-[org.gnome.desktop.screensaver]
-picture-uri='file:///usr/share/backgrounds/chaossynergy/chaossynergy-wallpaper.png'
+# Default to the niri session for the aiagent user on graphical login
+cat > /home/aiagent/.bash_profile << 'EOF'
+if [ "$(tty)" = "/dev/tty1" ]; then
+    export XDG_SESSION_TYPE=wayland
+    export XDG_CURRENT_DESKTOP=niri
+    exec niri-session
+fi
 EOF
-glib-compile-schemas /usr/share/glib-2.0/schemas/ || true
+chown aiagent:aiagent /home/aiagent/.bash_profile 2>/dev/null || true
 
-mkdir -p /usr/share/pixmaps
-cp /usr/share/icons/hicolor/scalable/apps/chaossynergy.svg /usr/share/pixmaps/chaossynergy.svg || true
-
-echo "[chaossynergy] Overlay complete."
+echo "[chaossynergy-niri] Overlay complete."
