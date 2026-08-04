@@ -92,7 +92,23 @@ cat > /home/aiagent/.bash_profile << 'EOF'
 if [ "$(tty)" = "/dev/tty1" ]; then
     export XDG_SESSION_TYPE=wayland
     export XDG_CURRENT_DESKTOP=niri
-    exec niri-session
+
+    # Ensure XDG_RUNTIME_DIR exists — raw agetty autologin may not provide it.
+    if [ -z "${XDG_RUNTIME_DIR}" ] || [ ! -d "${XDG_RUNTIME_DIR}" ]; then
+        export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+        mkdir -p "$XDG_RUNTIME_DIR"
+        chmod 700 "$XDG_RUNTIME_DIR"
+    fi
+
+    # Start niri-session. On failure, log the error to a file and drop to a
+    # shell so the crash is debuggable instead of looping back to the login.
+    if niri-session >/tmp/niri-session.log 2>&1; then
+        exit 0
+    else
+        echo "[chaossynergy] niri-session failed (see /tmp/niri-session.log). Dropping to shell."
+        cat /tmp/niri-session.log
+        exec bash --noprofile --norc
+    fi
 fi
 EOF
 chown aiagent:aiagent /home/aiagent/.bash_profile 2>/dev/null || true
