@@ -26,6 +26,7 @@ build-qcow2 tag="latest":
         -v "$OUT":/output \
         quay.io/centos-bootc/bootc-image-builder:latest \
         --type qcow2 \
+        --rootfs btrfs \
         localhost/chaossynergy:{{ tag }}
     chown -R "$USER:$USER" "$OUT" 2>/dev/null || true
 
