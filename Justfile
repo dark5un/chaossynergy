@@ -2,7 +2,9 @@
 # Agent-native immutable Linux. The OS is the agent interface.
 
 # Build the container image
-build-chaossynergy tag="stable":
+# NOTE: base-nvidia (uBlue base images) have no `stable` tag — they use
+# latest / gts / <fedora-version>. Default to `latest`.
+build-chaossynergy tag="latest":
     #!/usr/bin/bash
     set -eoux pipefail
     sudo podman build \
@@ -11,23 +13,24 @@ build-chaossynergy tag="stable":
         -f Containerfile .
 
 # Build a QCOW2 VM disk image
-build-qcow2 tag="stable":
+build-qcow2 tag="latest":
     #!/usr/bin/bash
     set -eoux pipefail
-    sudo rm -rf output/qcow2
-    mkdir -p output/qcow2
+    OUT="$(pwd)/output/qcow2"
+    sudo rm -rf "$OUT"
+    mkdir -p "$OUT"
     sudo podman run --rm -it \
         --privileged \
         --pull=newer \
         -v /var/lib/containers/storage:/var/lib/containers/storage \
-        -v /var/home/panos/workspace/chaossynergy/output/qcow2:/output \
+        -v "$OUT":/output \
         quay.io/centos-bootc/bootc-image-builder:latest \
         --type qcow2 \
         localhost/chaossynergy:{{ tag }}
-    sudo chown -R $USER:$USER output/qcow2
+    chown -R "$USER:$USER" "$OUT" 2>/dev/null || true
 
 # Run the QEMU VM
-run-vm-qcow2 tag="stable":
+run-vm-qcow2 tag="latest":
     #!/usr/bin/bash
     set -eoux pipefail
     DISK=$(ls output/qcow2/qcow2/*.qcow2 2>/dev/null | head -1)
