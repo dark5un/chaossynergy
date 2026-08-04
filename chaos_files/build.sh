@@ -18,8 +18,12 @@ chmod -R 755 /usr/bin/chaossynergy /usr/bin/chaossynergy-shell /usr/libexec/herm
 
 # ── Install niri (Wayland compositor) + Wayland session tooling ───────
 # niri is in the Fedora repos; niri-session wires up D-Bus + portals.
-dnf install -y niri niri-inhibit-tools niri-mpris || \
-  dnf install -y niri || true
+dnf install -y niri || true
+
+# Ghostty is COPR-only (not in vanilla Fedora). Enable the official build
+# before installing it as the default terminal.
+curl -fsSL --retry 3 -o /etc/yum.repos.d/_copr_scottames-ghostty.repo \
+  "https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-$(rpm -E %fedora)/scottames-ghostty-fedora-$(rpm -E %fedora).repo"
 
 # GNOME-free companion stack for a usable agent desktop:
 #   ghostty  — fast GPU-accelerated terminal emulator that herdr runs inside
@@ -27,18 +31,16 @@ dnf install -y niri niri-inhibit-tools niri-mpris || \
 #   wl-clipboard      — clipboard for the agent
 #   xdg-desktop-portal — portals for file dialogs
 #   fuzzel   — app launcher
+#   swaylock/swayidle — session lock + idle
 dnf install -y ghostty grim slurp swappy wl-clipboard \
-    xdg-desktop-portal xdg-desktop-portal-gtk \
-    polkit polkit-pkla-compat \
-    fuzzel swaylock swayidle || \
-dnf install -y grim slurp swappy wl-clipboard \
     xdg-desktop-portal xdg-desktop-portal-gtk \
     polkit polkit-pkla-compat \
     fuzzel swaylock swayidle || true
 
 # ── Install distrobox (agent containers) + herdr (agent multiplexer) ──
-curl -fsSL --retry 3 https://raw.githubusercontent.com/89luca89/distrobox/main/install \
-  | sh -s -- --prefix /usr/local
+# distrobox from the Fedora package (reliable in podman build); its curl
+# installer collides with the pre-existing /usr/local in this image.
+dnf install -y distrobox
 
 curl -fsSL --retry 3 -o /tmp/herdr \
   https://github.com/ogulcancelik/herdr/releases/download/v0.7.3/herdr-linux-x86_64
